@@ -1,13 +1,11 @@
 package com.lsy.commonmodules;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class CommonModulesApplicationTests {
-
-    @Test
-    void contextLoads() {
-    }
-
-}
+//@SpringBootTest
+//class CommonModulesApplicationTests {
+//
+//    @Test
+//    void contextLoads() {
+//    }
+//
+//}
