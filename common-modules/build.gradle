@@ -1,26 +1,78 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.3'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'maven-publish' // 💡 넥서스 업로드를 위한 플러그인
 }
 
 group = 'com.lsy'
 version = '0.0.1-SNAPSHOT'
+description = '공통 유틸 jar'
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
-    
+
+// 💡 실행 가능한 JAR은 만들지 않고, 일반 JAR만 만들도록 설정
+bootJar.enabled = false
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Boot starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // jasypt 암호화
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
+    // P6Spy
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.2'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// ✅ 자동 업로드 설정
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "nexus"
+//             local
+              url = uri("http://localhost:8081/repository/common-modules/")
+            credentials {
+                username = project.findProperty("nexusUsername") ?: ""
+                password = project.findProperty("nexusPassword") ?: ""
+            }
+            allowInsecureProtocol = true // ❗ HTTP 사용 시 필요 (https가 아니라면)
+        }
+    }
 }
 
 tasks.named('test') {
